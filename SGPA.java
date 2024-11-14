@@ -66,3 +66,45 @@ class Student {
         return SGPA;
     }
 }
+
+public class StudentDetails {
+
+    public static void main(String[] arg) {
+        Scanner sc = new Scanner(System.in);
+
+       
+        System.out.print("Enter number of semesters: ");
+        int numSems = sc.nextInt();
+       
+        Student[] students = new Student[numSems];
+        double cumulativeSGPA = 0.0;
+
+       
+        System.out.print("Enter USN: ");
+        String usn = sc.next();
+       
+        System.out.print("Enter Name: ");
+        String name = sc.next();
+
+       
+        for (int i = 0; i < numSems; i++) {
+            System.out.println("Enter details for semester " + (i + 1));
+            students[i] = new Student();
+            students[i].getMarks();
+            double semSGPA = students[i].calSGPA();
+            cumulativeSGPA += semSGPA;
+        }
+
+       
+        for (int i = 0; i < numSems; i++) {
+            System.out.println("USN: " + usn);
+            System.out.println("Name: " + name);
+            System.out.println("SGPA for sem " + (i + 1) + ": " + students[i].calSGPA());
+        }
+
+       
+        double CGPA = cumulativeSGPA / numSems;
+        System.out.println("CGPA: " + CGPA);
+    }
+}
+
