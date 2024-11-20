@@ -1,134 +1,105 @@
 import java.util.Scanner;
 
 class Account {
-    private String customer_name;
-    private int acc_no;
+    protected String customerName;
+    protected String accountNumber;
     protected double balance;
 
-    public Account(String customer_name, int acc_no, double balance) {
-        this.customer_name = customer_name;
-        this.acc_no = acc_no;
-        this.balance = balance;
-    }
-
-    public double getBalance() {
-        return balance;
+    public Account(String customerName, String accountNumber, double initialBalance) {
+        this.customerName = customerName;
+        this.accountNumber = accountNumber;
+        this.balance = initialBalance;
     }
 
     public void deposit(double amount) {
         if (amount > 0) {
             balance += amount;
-            System.out.println("Deposited: " + amount);
+            System.out.println("Deposit successful. Updated balance: " + balance);
         } else {
-            System.out.println("Deposit amount must be positive.");
+            System.out.println("Invalid deposit amount.");
         }
     }
-   public void withdraw(double amount)
-     {
-       if(amount<=getBalance()){
-          balance-=amount;
-          System.out.println("withdrew:"+amount + " balance is:"+ balance);
-          }
-       else
-         System.out.println("Insufficient funds!!");
-     }
-    public void displayBalance(){
-        System.out.println("Current Balance: " + balance);
+
+    public void displayBalance() {
+        System.out.println("Account Balance: " + balance);
     }
 }
 
-class SavingsAccount extends Account {
+class SavAcct extends Account {
     private double interestRate;
 
-    public SavingsAccount(String customerName, int accountNumber, double initialBalance, double interestRate) {
+    public SavAcct(String customerName, String accountNumber, double initialBalance, double interestRate) {
         super(customerName, accountNumber, initialBalance);
         this.interestRate = interestRate;
     }
 
-    public void computeAndDepositInterest() {
-        double interest = getBalance() * interestRate / 100;
-        deposit(interest);
+    public void computeAndDepositInterest(int years) {
+        double interest = balance * Math.pow((1 + interestRate / 100), years) - balance;
+        balance += interest;
+        System.out.println("Interest added: " + interest);
+        System.out.println("Updated balance: " + balance);
+    }
+
+    public void withdraw(double amount) {
+        if (amount > 0 && balance >= amount) {
+            balance -= amount;
+            System.out.println("Withdrawal successful. Updated balance: " + balance);
+        } else {
+            System.out.println("Insufficient funds or invalid withdrawal amount.");
+        }
     }
 }
-class CurrentAccount extends Account {
-    private double minimumBalance;
-    private double serviceCharge;
 
-    public CurrentAccount(String customerName, int accountNumber, double initialBalance, double minimumBalance, double serviceCharge) {
+class CurAcct extends Account {
+    private double minimumBalance;
+    private double penalty;
+
+    public CurAcct(String customerName, String accountNumber, double initialBalance, double minimumBalance, double penalty) {
         super(customerName, accountNumber, initialBalance);
         this.minimumBalance = minimumBalance;
-        this.serviceCharge = serviceCharge;
+        this.penalty = penalty;
     }
-    public void checkMinimumBalance() {
-        if (getBalance() < minimumBalance) {
-            System.out.println("Balance is below minimum");
-            balance-=serviceCharge;
-            System.out.println("Deducted service charge:" +serviceCharge);
-            System.out.println("Balance after deduction is:"+balance);
+
+    public void withdraw(double amount) {
+        if (amount > 0 && balance >= amount) {
+            balance -= amount;
+            if (balance < minimumBalance) {
+                balance -= penalty;
+                System.out.println("Penalty imposed: " + penalty);
+            }
+            System.out.println("Withdrawal successful. Updated balance: " + balance);
+        } else {
+            System.out.println("Insufficient funds or invalid withdrawal amount.");
         }
     }
 }
 
 public class Bank {
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("enter customer name:");
-        String name=sc.nextLine();
-        System.out.println("enter accno:");
-        int acc_no=sc.nextInt();      
-        System.out.println("enter initial balance:");
-        double balance=sc.nextDouble();
-        System.out.println("enter minimum balance:");
-        double minimum_balance=sc.nextDouble();
-        System.out.println("enter interest rate:");
-        double interest_rate=sc.nextDouble();
-        System.out.println("enter service charge:");
-        double service_charge=sc.nextDouble();
-        System.out.println("Enter choice:\n 1.Current acc\n 2.Savings acc");
-        int ch=sc.nextInt();
-        System.out.println("Customer name is:"+ name+"\nAccount number:"+acc_no+"\n");
+        Scanner scanner = new Scanner(System.in);
 
-        switch(ch){
-            case(1):
-                System.out.println("account is current type");
-                CurrentAccount ca = new CurrentAccount(name,acc_no,balance,minimum_balance,service_charge);
-               do{ System.out.println("enter choice:\n 1.deposit\n 2.withdraw\n 3.display balance");
-                int c=sc.nextInt();
-                ca.checkMinimumBalance();
-                if(c==1){
-                   System.out.println("enter amount to be deposited:");
-                   double amt=sc.nextDouble();
-                     ca.deposit(amt);}
-                else if(c==2){
-                   System.out.println("enter amount to withdraw:");
-                   double amt=sc.nextDouble();
-                   ca.withdraw(amt);}
-                else if(c==3){
-                   ca.displayBalance();}
-                else
-                  System.exit(0);
-                 }while(true);
-               
-           case(2):
-                 System.out.println("account is savings type");
-                SavingsAccount sa=new SavingsAccount(name,acc_no,balance,interest_rate);
-                do{ System.out.println("enter choice:\n 1.deposit\n 2.withdraw\n 3.display balance");
-                int c1=sc.nextInt();
-                if(c1==1){
-                   System.out.println("enter amount to be deposited:");
-                   double amt=sc.nextDouble();
-                     sa.deposit(amt);}
-                else if(c1==2){
-                   System.out.println("enter amount to withdraw:");
-                   double amt=sc.nextDouble();
-                   sa.withdraw(amt);}
-                else if(c1==3){
-                 sa.computeAndDepositInterest();
-                   sa.displayBalance();}
-                else{
-                  System.exit(0);
-                      }
-                }while(true);
+        SavAcct savingsAccount = new SavAcct("Alice", "S123", 1000.0, 5.0);
+        CurAcct currentAccount = new CurAcct("Bob", "C123", 2000.0, 500.0, 50.0);
+
+        System.out.println("1. Savings Account\n2. Current Account");
+        System.out.print("Select account type: ");
+        int accountType = scanner.nextInt();
+
+        if (accountType == 1) {
+            System.out.println("Savings Account Selected.");
+            savingsAccount.displayBalance();
+            savingsAccount.deposit(500);
+            savingsAccount.computeAndDepositInterest(2);
+            savingsAccount.withdraw(300);
+        } else if (accountType == 2) {
+            System.out.println("Current Account Selected.");
+            currentAccount.displayBalance();
+            currentAccount.deposit(1000);
+            currentAccount.withdraw(1800);
+        } else {
+            System.out.println("Invalid account type.");
+        }
+
+        scanner.close();
     }
-}
 }
