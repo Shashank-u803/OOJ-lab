@@ -1,7 +1,11 @@
 class WrongAgeException extends Exception {
+    private String message;
     public WrongAgeException(String message) {
-        super(message); // Pass error message to Exception class
+        this.message=message;
     }
+    public String toString(){
+	return message;
+  }
 }
 
 
@@ -45,7 +49,7 @@ public class InheritanceExceptionDemo {
            son.displayAges();
 
         } catch (WrongAgeException e) {
-            System.out.println("Caught Exception: " + e.getMessage());
+            System.out.println("Caught Exception: " + e);
         }
     }
 }
